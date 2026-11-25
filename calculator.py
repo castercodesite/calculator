@@ -1,4 +1,4 @@
-import random
+import json
 
 def add(a, b):
   return a + b
@@ -14,22 +14,28 @@ def division(a, b):
 
 def show_history(history):
   for record in history:
-    print(record)
+    print(f"{record['first']} {record['operation']} {record['second']} = {record['result']}")
 
 def save_history(history):
-  with open("history.txt", "w") as file:
-    for record in history:
-      file.write(record + "\n")
+  with open("history.json", "w") as f:
+    json.dump(history, f, indent = 2)
 
 def load_history():
-  current = []
   try:
-    with open("history.txt", "r") as file:
-      for record in file:
-        current.append(record.rstrip("\n"))
+    with open ("history.json", "r") as f:
+      return json.load(f)
   except FileNotFoundError:
     return []
-  return current
+
+def filter_history(history, operation):
+  found = False
+  for record in history:
+    if record["operation"] == operation:
+      print(f"{record["first"]} {record["operation"]} {record["second"]} = {record["result"]}")
+      found = True
+
+  
+
 
 history = load_history()
 
@@ -39,6 +45,7 @@ while True:
   print("3. Clear history")
   print("4. Quit")
   print("5. Delete most recent calculation")
+  print("6. Filter history")
   choice = input("Choose an option: ")
 
   if choice == '1':
@@ -55,17 +62,20 @@ while True:
     if var3 == 'add':
       result = add(var1, var2)
       print(result)
-      history.append(f"{var1} + {var2} = {result}")
+      record = {"first":var1, "second":var2, "operation":var3, "result":result}
+      history.append(record)
       save_history(history)
     elif var3 == 'subtract':
       result = subtract(var1, var2)
       print(result)
-      history.append(f"{var1} - {var2} = {result}")
+      record = {"first":var1, "second":var2, "operation":var3, "result":result}
+      history.append(record)
       save_history(history)
     elif var3 == 'multiplication':
       result = multiplication(var1, var2)
       print(result)
-      history.append(f"{var1} * {var2} = {result}")
+      record = {"first":var1, "second":var2, "operation":var3, "result":result}
+      history.append(record)
       save_history(history)
     elif var3 == 'division':
       if var2 == 0:
@@ -73,7 +83,8 @@ while True:
       else:
         result = division(var1, var2)
         print(result)
-        history.append(f"{var1} / {var2} = {result}")
+        record = {"first":var1, "second":var2, "operation":var3, "result":result}
+        history.append(record)
         save_history(history)
     else:
       print("Invalid Operation")
@@ -92,5 +103,9 @@ while True:
     else:
       history.pop()
       save_history(history)
+  elif choice == '6':
+    operation = input("What operation do you want to see?: ")
+    filter_history(history, operation)
+
   else:
     print("Invalid input. Try again")
