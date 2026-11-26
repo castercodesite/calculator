@@ -28,15 +28,17 @@ def load_history():
     return []
 
 def filter_history(history, operation):
-  found = False
+  matches = []
   for record in history:
     if record["operation"] == operation:
-      print(f"{record["first"]} {record["operation"]} {record["second"]} = {record["result"]}")
-      found = True
+      matches.append(record)
+  return matches
 
+def record_calculation(history, first, second, operation, result):
+  record = {"first":first, "second":second, "operation":operation, "result":result}
+  history.append(record)
+  save_history(history)
   
-
-
 history = load_history()
 
 while True:
@@ -62,30 +64,22 @@ while True:
     if var3 == 'add':
       result = add(var1, var2)
       print(result)
-      record = {"first":var1, "second":var2, "operation":var3, "result":result}
-      history.append(record)
-      save_history(history)
+      record_calculation(history, var1, var2, var3, result)
     elif var3 == 'subtract':
       result = subtract(var1, var2)
       print(result)
-      record = {"first":var1, "second":var2, "operation":var3, "result":result}
-      history.append(record)
-      save_history(history)
+      record_calculation(history, var1, var2, var3, result)
     elif var3 == 'multiplication':
       result = multiplication(var1, var2)
       print(result)
-      record = {"first":var1, "second":var2, "operation":var3, "result":result}
-      history.append(record)
-      save_history(history)
+      record_calculation(history, var1, var2, var3, result)
     elif var3 == 'division':
       if var2 == 0:
         print("Invalid Operation")
       else:
         result = division(var1, var2)
         print(result)
-        record = {"first":var1, "second":var2, "operation":var3, "result":result}
-        history.append(record)
-        save_history(history)
+        record_calculation(history, var1, var2, var3, result)
     else:
       print("Invalid Operation")
 
@@ -105,7 +99,11 @@ while True:
       save_history(history)
   elif choice == '6':
     operation = input("What operation do you want to see?: ")
-    filter_history(history, operation)
+    matches = filter_history(history, operation)
+    if matches:
+      show_history(matches)
+    else:
+      print("No matching records")
 
   else:
     print("Invalid input. Try again")
